@@ -1,0 +1,60 @@
+(1)Start Zookeeper
+
+C:\kafka>.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+(2)Now open another command prompt and change the directory to the kafka folder. Run kafka server using the command:
+
+C:\kafka>.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+(3)  create the input topic named streams-plaintext-input and the output topic named streams-wordcount-output
+
+C:\kafka>.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --create --topic streams-plaintext-input --partitions 1 --replication-factor 1
+
+> bin/kafka-topics.sh --create \
+    --bootstrap-server localhost:9092 \
+    --replication-factor 1 \
+    --partitions 1 \
+    --topic streams-plaintext-input
+	
+C:\kafka>.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --create --topic streams-plaintext-output --partitions 1 --replication-factor 1	
+	
+	
+> bin/kafka-topics.sh --create \
+    --bootstrap-server localhost:9092 \
+    --replication-factor 1 \
+    --partitions 1 \
+    --topic streams-wordcount-output \
+    --config cleanup.policy=compact
+	
+(4) Describe the topics
+
+ C:\kafka>.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic streams-plaintext-output --describe
+
+ C:\kafka>.\bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --topic streams-plaintext-input --describe
+ 
+(5) Start the Wordcount Application
+
+C:\kafka>.\bin\windows\kafka-run-class.bat org.apache.kafka.streams.examples.wordcount.WordCountDemo
+
+> bin/kafka-run-class.sh org.apache.kafka.streams.examples.wordcount.WordCountDemo
+
+(6) start the console producer in a separate terminal to write some input data to this topic:
+
+C:\kafka>.\bin\windows\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic streams-plaintext-input
+
+> bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic streams-plaintext-input
+
+(7) Inspect the output of the WordCount demo application by reading from its output topic with the console consumer in a separate terminal:
+
+
+C:\kafka>.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic streams-wordcount-output   --property print.key=true --property print.value=true --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer --from-beginning --formatter kafka.tools.DefaultMessageFormatter
+
+
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --topic streams-wordcount-output \
+    --from-beginning \
+    --formatter kafka.tools.DefaultMessageFormatter \
+    --property print.key=true \
+    --property print.value=true \
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
